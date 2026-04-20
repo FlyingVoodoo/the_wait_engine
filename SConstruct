@@ -1,17 +1,28 @@
 #!/usr/bin/env python3
+import os
+from SCons.Script import Default, Exit, SConscript
 
-from SCons.Script import Default, SConscript
+godot_cpp_dir = os.environ.get("GODOT_CPP_DIR", "../cpp_libs/godot-cpp")
+godot_cpp_sconstruct = os.path.join(godot_cpp_dir, "SConstruct")
 
-env = SConscript("cpp_libs/godot-cpp/SConstruct")
+if not os.path.exists(godot_cpp_sconstruct):
+    print(f"Error: godot-cpp not found at {godot_cpp_dir}")
+    print("Please set GODOT_CPP_DIR environment variable or check your paths.")
+    Exit(1)
 
-sources = env.Glob("src/*.cpp")
+env = SConscript(godot_cpp_sconstruct)
+
+if env["platform"] == "linux":
+    env['MAXLINELENGTH'] = 8192
 
 lib_name = "the_wait_cpp"
-
+sources = env.Glob("src/*.cpp")
 env.Append(CPPPATH=["src/"])
 
+target_path = "../bin/{}{}".format(lib_name, env["suffix"])
+
 library = env.SharedLibrary(
-    "bin/{}{}{}".format(lib_name, env["suffix"], '.so'),
+    target=target_path,
     source=sources,
 )
 

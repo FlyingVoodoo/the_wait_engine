@@ -1,0 +1,12 @@
+.sconsign.dblite
+.sconsign/
+*.os
+*.o
+*.obj
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+*.log
